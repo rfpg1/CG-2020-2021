@@ -7,7 +7,7 @@ var up = [0, 1, 0];
 
 main();
 
-//
+// 3.3
 // Start here
 //
 function main() {
@@ -460,7 +460,8 @@ function drawScene(gl, programInfo, buffers, deltaTime) {
                    aspect,
                    zNear,
                    zFar);
-  
+
+  // Camera Vista de cima
   mat4.rotate(projectionMatrix, projectionMatrix, Math.PI / 2, [1.0, 0.0, 0.0]);
   mat4.translate(projectionMatrix, projectionMatrix, [0.0, -10.0, 0.0]);
   //mat4.translate(projectionMatrix, projectionMatrix, [0.0, 0.0, -10.0]);
@@ -693,26 +694,24 @@ function drawScene(gl, programInfo, buffers, deltaTime) {
 
   // Now move the drawing position a bit to where we want to
   // start drawing the square.
-  
-  
-  
+    
   const cubePos = [modelViewMatrixCube[12] + 2, modelViewMatrixCube[13], modelViewMatrixCube[14]];
-  //const spherePos = [modelViewMatrixSphere[12], modelViewMatrixSphere[13], modelViewMatrixSphere[14]];
-  //const AmountToTranslate = [cubePos[0] - spherePos[0], cubePos[1] - spherePos[1], cubePos[2] - spherePos[2]];
-  mat4.translate(modelViewMatrixSphere,modelViewMatrixSphere,[modelViewMatrixCube[12], modelViewMatrixCube[13], modelViewMatrixCube[14]]);  // amount to translate
-  //console.log(AmountToTranslate);
+  //Afaste se ligeiramente do cubo
+  mat4.translate(modelViewMatrixSphere,modelViewMatrixSphere,[cubePos[0] - 2, cubePos[1], cubePos[2]]);
+
+  //Roda sobre o cubo
   mat4.rotate(modelViewMatrixSphere,  // destination matrix
     modelViewMatrixSphere,  // matrix to rotate
-              cubeRotation * 7,// amount to rotate in radians
+              cubeRotation * .7,// amount to rotate in radians
               [0.0, 1, 0.0]);       // axis to rotate around (X)
-
+  
+  //Vai para a posição do cubo
   mat4.translate(modelViewMatrixSphere,     // destination matrix
     modelViewMatrixSphere,     // matrix to translate
     cubePos);  // amount to translate
-  
-  mat4.rotate(modelViewMatrixSphere, modelViewMatrixSphere, cubeRotation * 0.3, [0.0, 1.0, 0.0]);
 
-  //console.log(modelViewMatrixCube); 
+  //Roda sobre si propria
+  mat4.rotate(modelViewMatrixSphere, modelViewMatrixSphere, cubeRotation * 0.3, [0.0, 1.0, 0.0]);
   
   const normalMatrixSphere = mat4.create();
   mat4.invert(normalMatrixSphere, modelViewMatrixSphere);

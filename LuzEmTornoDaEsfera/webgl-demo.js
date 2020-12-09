@@ -14,7 +14,7 @@ function degToRad(d) {
 
 main();
 
-//
+// 3.1
 // Start here
 //
 function main() {
@@ -38,6 +38,7 @@ function main() {
     uniform mat4 uNormalMatrix;
     uniform mat4 uModelViewMatrix;
     uniform mat4 uProjectionMatrix;
+    //Recebemos 2 floats para mudar a direcao da luz
     uniform float luz_x;
     uniform float luz_y;
 
@@ -51,7 +52,7 @@ function main() {
 
       highp vec3 ambientLight = 0.3 * vec3(1.0, 1.0, 1.0);
       highp vec3 directionalLightColor = vec3(1, 1, 1);
-      highp vec3 directionalVector = normalize(vec3(luz_x, 0.0, luz_y));
+      highp vec3 directionalVector = normalize(vec3(luz_x, 0.0, luz_y)); //Direcao da luz alterada a cada draw
 
       highp vec4 transformedNormal = uNormalMatrix * vec4(aVertexNormal, 1.0);
 
