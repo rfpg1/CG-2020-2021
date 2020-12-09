@@ -21,15 +21,16 @@ function main() {
   const vsSource = `
     attribute vec4 aVertexPosition;
     attribute vec3 aVertexNormal;
-    attribute vec2 aTextureCoord;
+    attribute vec4 aVertexColor;
 
     uniform mat4 uNormalMatrix;
     uniform mat4 uModelViewMatrix;
     uniform mat4 uProjectionMatrix;
 
+    varying lowp vec4 vColor;
+
     uniform vec3 uCameraPos;
 
-    varying highp vec2 vTextureCoord;
     varying highp vec4 vNormal;
 
     varying highp vec3 cameraView;
@@ -37,7 +38,7 @@ function main() {
 
     void main(void) {
       gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
-      vTextureCoord = aTextureCoord;
+      vColor = aVertexColor;
       cameraView = uCameraPos;
       cameraPosi = (uModelViewMatrix * aVertexPosition).xyz;
       
@@ -48,13 +49,11 @@ function main() {
   // Fragment shader program
 
   const fsSource = `
-    varying highp vec2 vTextureCoord;
+    varying lowp vec4 vColor;
     varying highp vec4 vNormal;
 
     varying highp vec3 cameraPosi;
     varying highp vec3 cameraView;
-
-    uniform sampler2D uSampler;
 
     void main(void) {
       //ESPECULAR
@@ -74,19 +73,17 @@ function main() {
       // SEPARACAO
       
       //DIFUSA
-      highp vec4 texelColor = texture2D(uSampler, vTextureCoord);
-
       highp vec3 ambientLight = 0.3 * vec3(1.0, 1.0, 1.0); //LUZ AMBIENTE
       highp vec3 directionalLightColor = vec3(1, 1, 1);
-      highp vec3 directionalVector = normalize(vec3(0.0, 0.0, 1.0));
+      highp vec3 directionalVector = normalize(vec3(1.0, 1.0, 1.0));
 
       highp float directional = max(dot(vNormal.xyz, directionalVector), 0.0);
       highp vec3 vLighting = (directionalLightColor * directional);
 
       highp vec3 halfVector = normalize(normalize(vec3(0.0, 0.0, -7.0) - cameraPosi) + normalize(cameraView - cameraPosi)); //Vem de frente a luz especular
-      highp float especular = max(dot(vNormal.xyz, halfVector), 0.0);
+      //highp float especular = max(dot(vNormal.xyz, halfVector), 0.0);
 
-      gl_FragColor = vec4(texelColor.rgb * vLighting, texelColor.a); //0 e 1 0 = MUITO ILUMINADO AKA ILUMINATI
+      gl_FragColor = vec4(vColor.rgb * vLighting, vColor.a); //0 e 1 0 = MUITO ILUMINADO AKA ILUMINATI
 
       //AMBIENTE
       //DIFUSA
@@ -119,7 +116,7 @@ function main() {
     attribLocations: {
       vertexPosition: gl.getAttribLocation(shaderProgram, 'aVertexPosition'),
       vertexNormal: gl.getAttribLocation(shaderProgram, 'aVertexNormal'),
-      textureCoord: gl.getAttribLocation(shaderProgram, 'aTextureCoord'),
+      textureCoord: gl.getAttribLocation(shaderProgram, 'aVertexColor'),
     },
     uniformLocations: {
       projectionMatrix: gl.getUniformLocation(shaderProgram, 'uProjectionMatrix'),
