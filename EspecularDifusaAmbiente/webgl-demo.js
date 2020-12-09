@@ -331,10 +331,7 @@ function drawScene(gl, programInfo, buffers, deltaTime) {
   mat4.perspective(projectionMatrix, fieldOfView, aspect, zNear, zFar);
 
   mat4.translate(projectionMatrix, projectionMatrix, [0.0, 0.0, -16.0]);
-  //mat4.rotate(projectionMatrix, projectionMatrix, cubeRotation * 0.7, [0.0, 1.0, 0.0]);
-  //mat4.lookAt(projectionMatrix, [40.0, 0.0, 0.0], [0.0, 0.0, 0.1], [0.0, 1.0, 0.0])
   
-
   // Set the drawing position to the "identity" point, which is
   // the center of the scene.
   const modelViewMatrixCube = mat4.create();

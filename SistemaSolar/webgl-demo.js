@@ -474,16 +474,18 @@ function drawScene(gl, programInfo, buffers, deltaTime) {
 
   // Now move the drawing position a bit to where we want to
   // start drawing the square.
-
+  //Rodar à volta da piramide
   mat4.rotate(modelViewMatrixCube,  // destination matrix
     modelViewMatrixCube,  // matrix to rotate
               cubeRotation * .7,// amount to rotate in radians
               [0.0, 1.0, 0.0]);       // axis to rotate around (X)
 
+  //Afastar se da piramide
   mat4.translate(modelViewMatrixCube,     // destination matrix
     modelViewMatrixCube,     // matrix to translate
                  [6.0, 0.0, 0.0]);  // amount to translate
-  
+
+  //Rodar sobre si proprio
   mat4.rotate(modelViewMatrixCube, modelViewMatrixCube, cubeRotation * 0.3, [0.0, 1.0, 0.0]);
   
   const normalMatrixCube = mat4.create();
@@ -594,12 +596,7 @@ function drawScene(gl, programInfo, buffers, deltaTime) {
   mat4.translate(modelViewMatrixPyramid,     // destination matrix
     modelViewMatrixPyramid,     // matrix to translate
                  [0.0, 0.0, 0.0]);  // amount to translate
-  /*
-  mat4.rotate(modelViewMatrixPyramid,  // destination matrix
-    modelViewMatrixPyramid,  // matrix to rotate
-              Math.PI * 3/2,// amount to rotate in radians
-              [0, 1, 0]);       // axis to rotate around (X)
-  */           
+
   const normalMatrixPyramid = mat4.create();
   mat4.invert(normalMatrixPyramid, modelViewMatrixPyramid);
   mat4.transpose(normalMatrixPyramid, modelViewMatrixPyramid);

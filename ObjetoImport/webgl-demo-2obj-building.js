@@ -24,7 +24,7 @@ sleep(5000).then(() => {
 });
 
 
-//
+// 4.2
 // Start here
 //
 function main() {
@@ -91,7 +91,6 @@ function main() {
   // objects we'll be drawing.
   const buffers = initBuffers_main(gl);  //ng: _main
   console.log(buffers);
-//const buffers = null;
 
   var then = 0;
 
@@ -401,13 +400,7 @@ function initBuffers_main(gl){
 }
 
 function init_building(gl){
-    //Scene.loadObjectByParts('models/geometry/Building/part','Office',758);
-    Scene.loadObjectByParts('models/geometry/arco/part','Object',2);
-    //Scene.loadObject('models/geometry/Building/arco.json','Object');
-    //Load the ground
-    //Scene.loadObject('models/geometry/Building/plane.json','Plane');
-    //Scene.loadObject('models/geometry/Building/obj.json','Object');
-    //console.log(Scene.objects)
+    Scene.loadObjectByParts('models/geometry/arco/part','Object',2); //Import do nosso arco 4.2
     return Scene;
 }
 
@@ -456,23 +449,15 @@ function drawScene(gl, programInfo, buffers, deltaTime) {
   //https://learnopengl.com/Getting-started/Camera
   const viewMatrix = mat4.create();
 
-  //mat4.lookAt(viewMatrix, [0.0, 0.0, 25.0], [0.0, 0.0, 1.0], [0.0, 1.0, 0.0]);
   mat4.translate(viewMatrix, viewMatrix, [0.0,  0.0, -40.0]);
-  //console.log("viewMatrix", viewMatrix);
-
+ 
   /**********************************************************************/
-  
+  //Desenhar o cubo
   const modelMatrixCube = mat4.create();
   
   mat4.translate(modelMatrixCube,     // destination matrix
     modelMatrixCube,     // matrix to translate
-                 [-8.0, 0.0, 0.0]);  // amount to translate
-  /*
-  mat4.rotate(modelMatrixCube,  // destination matrix
-    modelMatrixCube,  // matrix to rotate
-              cubeRotation,// amount to rotate in radians
-              [0, 1, 0]);       // axis to rotate around (X)
-   */ 
+                 [-8.0, 0.0, 0.0]);  // amount to translate  
 
   {
     const numComponents = 3;
@@ -539,10 +524,10 @@ function drawScene(gl, programInfo, buffers, deltaTime) {
   }
 
   /******************************************************************************************/
+  //Desenhar o Piramide
+  const modelMatrixPyramid = mat4.create();
 
-  const modelMatrixCube2 = mat4.create();
-
-  mat4.translate(modelMatrixCube2, modelMatrixCube2, [8.0, 0.0, 0.0]);
+  mat4.translate(modelMatrixPyramid, modelMatrixPyramid, [8.0, 0.0, 0.0]);
 
   {
     const numComponents = 3;
@@ -596,7 +581,7 @@ gl.uniformMatrix4fv(
   gl.uniformMatrix4fv(
     programInfo.uniformLocations.modelMatrix,
     false,
-    modelMatrixCube2);
+    modelMatrixPyramid);
 
   {
     const vertexCount = 12;
