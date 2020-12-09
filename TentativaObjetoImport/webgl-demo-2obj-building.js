@@ -402,7 +402,8 @@ function initBuffers_main(gl){
 
 function init_building(gl){
     //Scene.loadObjectByParts('models/geometry/Building/part','Office',758);
-    Scene.loadObject('models/geometry/Building/arco.json','Object');
+    Scene.loadObjectByParts('models/geometry/arco/part','Object',2);
+    //Scene.loadObject('models/geometry/Building/arco.json','Object');
     //Load the ground
     //Scene.loadObject('models/geometry/Building/plane.json','Plane');
     //Scene.loadObject('models/geometry/Building/obj.json','Object');
@@ -465,7 +466,7 @@ function drawScene(gl, programInfo, buffers, deltaTime) {
   
   mat4.translate(modelMatrixCube,     // destination matrix
     modelMatrixCube,     // matrix to translate
-                 [-5.0, 0.0, 0.0]);  // amount to translate
+                 [-8.0, 0.0, 0.0]);  // amount to translate
   /*
   mat4.rotate(modelMatrixCube,  // destination matrix
     modelMatrixCube,  // matrix to rotate
@@ -672,7 +673,7 @@ gl.uniformMatrix4fv(
      gl.drawElements(gl.TRIANGLES, vertexCount, type, offset);
   }
   
-  //draw_json(gl, programInfo);
+  draw_json(gl, programInfo);
   
   // Update the rotation for the next draw
 
