@@ -21,18 +21,18 @@ function main() {
   const vsSource = `
     attribute vec4 aVertexPosition;
     attribute vec3 aVertexNormal;
-    attribute vec2 aTextureCoord;
+    attribute vec4 aVertexColor;
 
     uniform mat4 uNormalMatrix;
     uniform mat4 uModelViewMatrix;
     uniform mat4 uProjectionMatrix;
 
-    varying highp vec2 vTextureCoord;
+    varying lowp vec4 vColor;
     varying highp vec4 vNormal;
 
     void main(void) {
       gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
-      vTextureCoord = aTextureCoord;
+      vColor = aVertexColor;
 
       // Apply lighting effect
 
@@ -41,24 +41,20 @@ function main() {
   `;
 
   // Fragment shader program
-
+  // Phong implementado 2.1
   const fsSource = `
-    varying highp vec2 vTextureCoord;
     varying highp vec4 vNormal;
-
-    uniform sampler2D uSampler;
+    varying lowp vec4 vColor;
 
     void main(void) {
-      highp vec4 texelColor = texture2D(uSampler, vTextureCoord);
-
-      highp vec3 ambientLight = vec3(0.3, 0.3, 0.3);
+      highp vec3 ambientLight = 0.3 * vec3(1.0, 1.0, 1.0);
       highp vec3 directionalLightColor = vec3(1, 1, 1);
       highp vec3 directionalVector = normalize(vec3(0.0, 0.0, 1.0));
 
       highp float directional = max(dot(vNormal.xyz, directionalVector), 0.0);
       highp vec3 vLighting = ambientLight + (directionalLightColor * directional);
 
-      gl_FragColor = vec4(texelColor.rgb * vLighting, texelColor.a);
+      gl_FragColor = vec4(vColor.rgb * vLighting, vColor.a);
     }
   `;
 
@@ -75,7 +71,7 @@ function main() {
     attribLocations: {
       vertexPosition: gl.getAttribLocation(shaderProgram, 'aVertexPosition'),
       vertexNormal: gl.getAttribLocation(shaderProgram, 'aVertexNormal'),
-      textureCoord: gl.getAttribLocation(shaderProgram, 'aTextureCoord'),
+      vertexColor: gl.getAttribLocation(shaderProgram, 'aVertexColor'),
     },
     uniformLocations: {
       projectionMatrix: gl.getUniformLocation(shaderProgram, 'uProjectionMatrix'),
@@ -89,8 +85,6 @@ function main() {
   // objects we'll be drawing.
   const buffers = initBuffers(gl);
 
-  const texture = loadTexture(gl, 'cubetexture.png');
-
   var then = 0;
 
   // Draw the scene repeatedly
@@ -99,7 +93,7 @@ function main() {
     const deltaTime = now - then;
     then = now;
 
-    drawScene(gl, programInfo, buffers, texture, deltaTime);
+    drawScene(gl, programInfo, buffers, deltaTime);
 
     requestAnimationFrame(render);
   }
@@ -217,44 +211,29 @@ function initBuffers(gl) {
 
   // Now set up the texture coordinates for the faces.
 
-  const textureCoordBufferCube = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, textureCoordBufferCube);
-
-  const textureCoordinatesCube = [
-    // Front
-    0.0,  0.0,
-    1.0,  0.0,
-    1.0,  1.0,
-    0.0,  1.0,
-    // Back
-    0.0,  0.0,
-    1.0,  0.0,
-    1.0,  1.0,
-    0.0,  1.0,
-    // Top
-    0.0,  0.0,
-    1.0,  0.0,
-    1.0,  1.0,
-    0.0,  1.0,
-    // Bottom
-    0.0,  0.0,
-    1.0,  0.0,
-    1.0,  1.0,
-    0.0,  1.0,
-    // Right
-    0.0,  0.0,
-    1.0,  0.0,
-    1.0,  1.0,
-    0.0,  1.0,
-    // Left
-    0.0,  0.0,
-    1.0,  0.0,
-    1.0,  1.0,
-    0.0,  1.0,
+  const faceColorsCube = [
+    [0.0,  1.0,  0.0,  1.0],    // Front face: white
+    [0.0,  1.0,  0.0,  1.0],    // Back face: red
+    [0.0,  1.0,  0.0,  1.0],    // Top face: green
+    [0.0,  1.0,  0.0,  1.0],    // Bottom face: blue
+    [0.0,  1.0,  0.0,  1.0],    // Right face: yellow
+    [0.0,  1.0,  0.0,  1.0],    // Left face: purple
   ];
 
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoordinatesCube),
-                gl.STATIC_DRAW);
+  // Convert the array of colors into a table for all the vertices.
+
+  var colorsCube = [];
+
+  for (var j = 0; j < faceColorsCube.length; ++j) {
+    const c = faceColorsCube[j];
+
+    // Repeat each color four times for the four vertices of the face
+    colorsCube = colorsCube.concat(c, c, c, c);
+  }
+
+  const colorBufferCube= gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, colorBufferCube);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colorsCube), gl.STATIC_DRAW);
 
   // Build the element array buffer; this specifies the indices
   // into the vertex arrays for each face's vertices.
@@ -283,69 +262,15 @@ function initBuffers(gl) {
   return {
     position: positionBufferCube,
     normal: normalBufferCube,
-    textureCoord: textureCoordBufferCube,
+    color: colorBufferCube,
     indices: indexBuffer,
   };
 }
 
 //
-// Initialize a texture and load an image.
-// When the image finished loading copy it into the texture.
-//
-function loadTexture(gl, url) {
-  const texture = gl.createTexture();
-  gl.bindTexture(gl.TEXTURE_2D, texture);
-
-  // Because images have to be download over the internet
-  // they might take a moment until they are ready.
-  // Until then put a single pixel in the texture so we can
-  // use it immediately. When the image has finished downloading
-  // we'll update the texture with the contents of the image.
-  const level = 0;
-  const internalFormat = gl.RGBA;
-  const width = 1;
-  const height = 1;
-  const border = 0;
-  const srcFormat = gl.RGBA;
-  const srcType = gl.UNSIGNED_BYTE;
-  const pixel = new Uint8Array([0, 255, 0, 255]);  // opaque blue
-  gl.texImage2D(gl.TEXTURE_2D, level, internalFormat,
-                width, height, border, srcFormat, srcType,
-                pixel);
-  /*
-  const image = new Image();
-  image.onload = function() {
-    gl.bindTexture(gl.TEXTURE_2D, texture);
-    gl.texImage2D(gl.TEXTURE_2D, level, internalFormat,
-                  srcFormat, srcType, image);
-
-    // WebGL1 has different requirements for power of 2 images
-    // vs non power of 2 images so check if the image is a
-    // power of 2 in both dimensions.
-    if (isPowerOf2(image.width) && isPowerOf2(image.height)) {
-       // Yes, it's a power of 2. Generate mips.
-       gl.generateMipmap(gl.TEXTURE_2D);
-    } else {
-       // No, it's not a power of 2. Turn of mips and set
-       // wrapping to clamp to edge
-       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-    }
-  };
-  image.src = url;
-  */
-  return texture;
-}
-
-function isPowerOf2(value) {
-  return (value & (value - 1)) == 0;
-}
-
-//
 // Draw the scene.
 //
-function drawScene(gl, programInfo, buffers, texture, deltaTime) {
+function drawScene(gl, programInfo, buffers, deltaTime) {
   gl.clearColor(0.0, 0.0, 0.0, 1.0);  // Clear to black, fully opaque
   gl.clearDepth(1.0);                 // Clear everything
   gl.enable(gl.DEPTH_TEST);           // Enable depth testing
@@ -376,6 +301,8 @@ function drawScene(gl, programInfo, buffers, texture, deltaTime) {
                    zNear,
                    zFar);
 
+  mat4.translate(projectionMatrix, projectionMatrix, [0.0, 0.0, -10.0]);
+
   // Set the drawing position to the "identity" point, which is
   // the center of the scene.
   const modelViewMatrix = mat4.create();
@@ -385,11 +312,8 @@ function drawScene(gl, programInfo, buffers, texture, deltaTime) {
 
   mat4.translate(modelViewMatrix,     // destination matrix
                  modelViewMatrix,     // matrix to translate
-                 [-0.0, 0.0, -6.0]);  // amount to translate
-  mat4.rotate(modelViewMatrix,  // destination matrix
-              modelViewMatrix,  // matrix to rotate
-              cubeRotation,     // amount to rotate in radians
-              [0, 0, 1]);       // axis to rotate around (Z)
+                 [2.0, 0.0, 0.0]);  // amount to translate
+
   mat4.rotate(modelViewMatrix,  // destination matrix
               modelViewMatrix,  // matrix to rotate
               cubeRotation * .7,// amount to rotate in radians
@@ -422,21 +346,21 @@ function drawScene(gl, programInfo, buffers, texture, deltaTime) {
   // Tell WebGL how to pull out the texture coordinates from
   // the texture coordinate buffer into the textureCoord attribute.
   {
-    const numComponents = 2;
+    const numComponents = 4;
     const type = gl.FLOAT;
     const normalize = false;
     const stride = 0;
     const offset = 0;
-    gl.bindBuffer(gl.ARRAY_BUFFER, buffers.textureCoord);
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffers.color);
     gl.vertexAttribPointer(
-        programInfo.attribLocations.textureCoord,
+        programInfo.attribLocations.vertexColor,
         numComponents,
         type,
         normalize,
         stride,
         offset);
     gl.enableVertexAttribArray(
-        programInfo.attribLocations.textureCoord);
+        programInfo.attribLocations.vertexColor);
   }
 
   // Tell WebGL how to pull out the normals from
@@ -480,17 +404,6 @@ function drawScene(gl, programInfo, buffers, texture, deltaTime) {
       programInfo.uniformLocations.normalMatrix,
       false,
       normalMatrix);
-
-  // Specify the texture to map onto the faces.
-
-  // Tell WebGL we want to affect texture unit 0
-  gl.activeTexture(gl.TEXTURE0);
-
-  // Bind the texture to texture unit 0
-  gl.bindTexture(gl.TEXTURE_2D, texture);
-
-  // Tell the shader we bound the texture to texture unit 0
-  gl.uniform1i(programInfo.uniformLocations.uSampler, 0);
 
   {
     const vertexCount = 36;

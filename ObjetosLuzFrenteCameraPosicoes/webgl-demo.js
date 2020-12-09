@@ -40,7 +40,7 @@ function main() {
 
       highp vec3 ambientLight = 0.3 * vec3(1.0, 1.0, 1.0);
       highp vec3 directionalLightColor = vec3(1, 1, 1);
-      highp vec3 directionalVector = normalize(vec3(0.0, 0.0, 1.0)); //Luz vinda de frente
+      highp vec3 directionalVector = normalize(vec3(0.0, 0.0, 1.0)); //Luz vinda de frente 1.2
 
       highp vec4 transformedNormal = uNormalMatrix * vec4(aVertexNormal, 1.0);
 
@@ -112,9 +112,10 @@ function main() {
 // have one object -- a simple three-dimensional cube.
 //
 function initBuffers(gl) {
+  //Variavel onde vão estar todos os buffers de todos os objetos, cada posição é um objeto
   var result = [];
   // Create a buffer for the cube's vertex positions.
-
+  //Criação do objeto -> CUBO
   const positionBufferCube = gl.createBuffer();
 
   // Select the positionBuffer as the one to apply buffer
@@ -264,7 +265,9 @@ function initBuffers(gl) {
   gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indicesCube), gl.STATIC_DRAW);
 
   result.push({position: positionBufferCube, normal: normalBufferCube, color: colorBufferCube, indices: indexBufferCube});
+  
  /***********************************************************************************************************************************************/
+ //Criação do objeto -> Piramide
   const positionBufferPyramid = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, positionBufferPyramid);
   
@@ -342,7 +345,7 @@ function initBuffers(gl) {
 
   result.push({position: positionBufferPyramid, normal: normalBufferPyramid, color: colorBufferPyramid});
   /***********************************************************************************************************/
-
+  //Criação do objeto -> Esfera
   const postionSphere = [];
   const vertexNormalsSphere = [];
   var faceColorsSphere = [];
@@ -459,13 +462,13 @@ function drawScene(gl, programInfo, buffers, deltaTime) {
                    zNear,
                    zFar);
 
-  //rodar a camera para a esquerda
+  //rodar a camera para a esquerda 1.3
   /*
   mat4.translate(projectionMatrix, projectionMatrix, [5.0, 0.0, -5.0]);
   mat4.rotate(projectionMatrix, projectionMatrix, Math.PI / 2, [0.0, 1.0, 0.0]);
   */
   
-  //Rodar a camara para cima, vista de cima
+  //Rodar a camara para cima, vista de cima 1.4
   /*
   mat4.rotate(projectionMatrix, projectionMatrix, Math.PI / 2, [1.0, 0.0, 0.0]);
   mat4.translate(projectionMatrix, projectionMatrix, [0.0, -10.0, 0.0]);
@@ -476,16 +479,16 @@ function drawScene(gl, programInfo, buffers, deltaTime) {
 
   // Now move the drawing position a bit to where we want to
   // start drawing the square.
-
+  //Move-lo para a esquerda
   mat4.translate(modelViewMatrixCube,     // destination matrix
     modelViewMatrixCube,     // matrix to translate
                  [2.0, 0.0, -6.0]);  // amount to translate
-  /*
+  //Rodar sobre si proprio
   mat4.rotate(modelViewMatrixCube,  // destination matrix
     modelViewMatrixCube,  // matrix to rotate
               cubeRotation * .7,// amount to rotate in radians
               [0, 1, 0]);       // axis to rotate around (X)
-  */
+  
   const normalMatrixCube = mat4.create();
   mat4.invert(normalMatrixCube, modelViewMatrixCube);
   mat4.transpose(normalMatrixCube, normalMatrixCube);
@@ -572,7 +575,7 @@ function drawScene(gl, programInfo, buffers, deltaTime) {
       programInfo.uniformLocations.normalMatrix,
       false,
       normalMatrixCube);
-
+  //Função que manda desenhar o cubo depois de tudo ter sido definido
   {
     const vertexCount = 36;
     const type = gl.UNSIGNED_SHORT;
