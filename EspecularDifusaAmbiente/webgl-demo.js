@@ -57,30 +57,30 @@ function main() {
 
     void main(void) {
       //ESPECULAR 2.2
-      //highp vec3 ambientLight = 0.3 * vec3(1.0, 1.0, 1.0); //LUZ AMBIENTE
-      //highp vec3 directionalLightColor = vec3(1, 1, 1);
-      //highp vec3 directionalVector = normalize(vec3(0.0, 0.0, 1.0));
-
-      //highp float directional = max(dot(vNormal.xyz, directionalVector), 0.0);
-      //highp vec3 vLighting = ambientLight + (directionalLightColor * directional);
-
-      //highp vec3 halfVector = normalize(normalize(vec3(0.0, 0.0, -7.0) - cameraPosi) + normalize(cameraView - cameraPosi)); //Vem de frente a luz especular
-      //highp float especular = max(dot(vNormal.xyz, halfVector), 0.0);
-
-      //gl_FragColor = vec4(vColor.rgb * vLighting + (pow(especular, 1.0)), vColor.a); //0 e 1 0 = MUITO ILUMINADO AKA ILUMINATI
-      
-      //DIFUSA 2.3
       highp vec3 ambientLight = 0.3 * vec3(1.0, 1.0, 1.0); //LUZ AMBIENTE
       highp vec3 directionalLightColor = vec3(1, 1, 1);
-      highp vec3 directionalVector = normalize(vec3(1.0, 1.0, 1.0));
+      highp vec3 directionalVector = normalize(vec3(0.0, 0.0, 1.0));
 
       highp float directional = max(dot(vNormal.xyz, directionalVector), 0.0);
-      highp vec3 vLighting = (directionalLightColor * directional);
+      highp vec3 vLighting = ambientLight + (directionalLightColor * directional);
 
       highp vec3 halfVector = normalize(normalize(vec3(0.0, 0.0, -7.0) - cameraPosi) + normalize(cameraView - cameraPosi)); //Vem de frente a luz especular
       highp float especular = max(dot(vNormal.xyz, halfVector), 0.0);
 
-      gl_FragColor = vec4(vColor.rgb * vLighting, vColor.a); //0 e 1 0 = MUITO ILUMINADO AKA ILUMINATI
+      gl_FragColor = vec4(vColor.rgb * vLighting + (pow(especular, 5.0)), vColor.a); //0 e 1 0 = MUITO ILUMINADO AKA ILUMINATI
+      
+      //DIFUSA 2.3
+      //highp vec3 ambientLight = 0.3 * vec3(1.0, 1.0, 1.0); //LUZ AMBIENTE
+      //highp vec3 directionalLightColor = vec3(1, 1, 1);
+      //highp vec3 directionalVector = normalize(vec3(1.0, 1.0, 1.0));
+
+      //highp float directional = max(dot(vNormal.xyz, directionalVector), 0.0);
+      //highp vec3 vLighting = (directionalLightColor * directional);
+
+      //highp vec3 halfVector = normalize(normalize(vec3(0.0, 0.0, -7.0) - cameraPosi) + normalize(cameraView - cameraPosi)); //Vem de frente a luz especular
+      //highp float especular = max(dot(vNormal.xyz, halfVector), 0.0);
+
+      //gl_FragColor = vec4(vColor.rgb * vLighting, vColor.a); //0 e 1 0 = MUITO ILUMINADO AKA ILUMINATI
 
       //AMBIENTE 2.3
       //highp vec3 ambientLight = 0.5 * vec3(1.0, 1.0, 1.0); //LUZ AMBIENTE

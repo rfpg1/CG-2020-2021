@@ -469,10 +469,10 @@ function drawScene(gl, programInfo, buffers, deltaTime) {
   */
   
   //Rodar a camara para cima, vista de cima 1.4
-  /*
+  
   mat4.rotate(projectionMatrix, projectionMatrix, Math.PI / 2, [1.0, 0.0, 0.0]);
   mat4.translate(projectionMatrix, projectionMatrix, [0.0, -10.0, 0.0]);
-  */
+  
   // Set the drawing position to the "identity" point, which is
   // the center of the scene.
   const modelViewMatrixCube = mat4.create();
@@ -484,10 +484,12 @@ function drawScene(gl, programInfo, buffers, deltaTime) {
     modelViewMatrixCube,     // matrix to translate
                  [2.0, 0.0, -6.0]);  // amount to translate
   //Rodar sobre si proprio
+  /*
   mat4.rotate(modelViewMatrixCube,  // destination matrix
     modelViewMatrixCube,  // matrix to rotate
               cubeRotation * .7,// amount to rotate in radians
               [0, 1, 0]);       // axis to rotate around (X)
+  */
   
   const normalMatrixCube = mat4.create();
   mat4.invert(normalMatrixCube, modelViewMatrixCube);
