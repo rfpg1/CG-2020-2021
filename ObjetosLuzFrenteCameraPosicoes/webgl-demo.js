@@ -597,12 +597,7 @@ function drawScene(gl, programInfo, buffers, deltaTime) {
   mat4.translate(modelViewMatrixPyramid,     // destination matrix
     modelViewMatrixPyramid,     // matrix to translate
                  [-2.5, 0.0, -6.0]);  // amount to translate
-  
-  mat4.rotate(modelViewMatrixPyramid,  // destination matrix
-    modelViewMatrixPyramid,  // matrix to rotate
-              Math.PI * 3/2,// amount to rotate in radians
-              [0, 1, 0]);       // axis to rotate around (X)
-             
+               
   const normalMatrixPyramid = mat4.create();
   mat4.invert(normalMatrixPyramid, modelViewMatrixPyramid);
   mat4.transpose(normalMatrixPyramid, modelViewMatrixPyramid);
